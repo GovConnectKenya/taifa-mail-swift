@@ -1,6 +1,6 @@
 import Foundation
 
-/// The `domains` resource. Accessed as `axene.domains`.
+/// The `domains` resource. Accessed as `taifamail.domains`.
 ///
 /// NICHE endpoints (ns-provider, bimi*, domain-connect*) are intentionally not
 /// covered in this version.
@@ -58,7 +58,7 @@ public final class Domains {
         try await http.request("POST", "/v1/domains/\(esc(id))/rotate-dkim")
     }
 
-    /// Initiate a transfer of this domain to another Axene account.
+    /// Initiate a transfer of this domain to another TaifaMail account.
     public func transfer(_ id: String, targetEmail: String, note: String? = nil) async throws -> DomainTransfer {
         let body = RequestBody([
             ("target_email", .string(targetEmail)),

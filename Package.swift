@@ -2,19 +2,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "AxeneMailer",
+    name: "TaifaMailSDK",
     platforms: [
         .macOS(.v12),
         .iOS(.v15)
     ],
     products: [
-        .library(name: "AxeneMailer", targets: ["AxeneMailer"])
+        .library(name: "TaifaMailSDK", targets: ["TaifaMailSDK"])
     ],
     targets: [
-        .target(name: "AxeneMailer"),
+        .target(name: "TaifaMailSDK"),
         .testTarget(
-            name: "AxeneMailerTests",
-            dependencies: ["AxeneMailer"]
+            name: "TaifaMailSDKTests",
+            dependencies: ["TaifaMailSDK"]
         )
     ]
 )

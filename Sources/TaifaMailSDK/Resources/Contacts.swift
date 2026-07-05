@@ -1,6 +1,6 @@
 import Foundation
 
-/// The `contacts` resource. Accessed as `axene.contacts`.
+/// The `contacts` resource. Accessed as `taifamail.contacts`.
 public final class Contacts {
     private let http: Transport
     init(_ http: Transport) { self.http = http }

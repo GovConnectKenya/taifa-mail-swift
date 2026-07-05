@@ -41,10 +41,10 @@ struct DynamicKey: CodingKey {
 }
 
 /// Configuration for ``Transport``.
-public struct AxeneOptions {
-    /// API key from your Axene Mailer dashboard (starts with `axm_k_`).
+public struct TaifaMailOptions {
+    /// API key from your Taifa Mail dashboard (starts with `axm_k_`).
     public let apiKey: String
-    /// Override the API base URL. Defaults to `https://mail.axene.io`.
+    /// Override the API base URL. Defaults to `https://govconnect.ke`.
     public let baseURL: String
     /// Total attempts on `429` / `5xx`, including the first. Defaults to `3`.
     public let maxRetries: Int
@@ -55,7 +55,7 @@ public struct AxeneOptions {
 
     public init(
         apiKey: String,
-        baseURL: String = "https://mail.axene.io",
+        baseURL: String = "https://govconnect.ke",
         maxRetries: Int = 3,
         timeout: TimeInterval = 30,
         session: URLSession = .shared
@@ -71,7 +71,7 @@ public struct AxeneOptions {
 /// The HTTP transport: the single place that talks to the network. Owns bearer
 /// authentication, JSON encode/decode, retries on `429`/`5xx` with backoff
 /// (honouring `Retry-After`), multipart upload, and error mapping to
-/// ``AxeneError``. Resources are thin and call this.
+/// ``TaifaMailError``. Resources are thin and call this.
 final class Transport {
     private let apiKey: String
     private let baseURL: String
@@ -81,8 +81,8 @@ final class Transport {
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
 
-    init(_ options: AxeneOptions) {
-        precondition(!options.apiKey.isEmpty, "Axene: `apiKey` is required.")
+    init(_ options: TaifaMailOptions) {
+        precondition(!options.apiKey.isEmpty, "TaifaMail: `apiKey` is required.")
         self.apiKey = options.apiKey
         // Strip trailing slashes from the base URL.
         var base = options.baseURL
@@ -108,7 +108,7 @@ final class Transport {
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
-            throw AxeneError(status: 0, message: "Axene: failed to decode response: \(error)")
+            throw TaifaMailError(status: 0, message: "TaifaMail: failed to decode response: \(error)")
         }
     }
 
@@ -124,7 +124,7 @@ final class Transport {
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
-            throw AxeneError(status: 0, message: "Axene: failed to decode response: \(error)")
+            throw TaifaMailError(status: 0, message: "TaifaMail: failed to decode response: \(error)")
         }
     }
 
@@ -151,7 +151,7 @@ final class Transport {
         var request = URLRequest(url: url, timeoutInterval: timeout)
         request.httpMethod = method
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.setValue("axene-mailer-swift", forHTTPHeaderField: "User-Agent")
+        request.setValue("taifa-mail-swift", forHTTPHeaderField: "User-Agent")
         if let jsonData {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = jsonData
@@ -165,7 +165,7 @@ final class Transport {
             do {
                 let (data, response) = try await session.data(for: request)
                 guard let http = response as? HTTPURLResponse else {
-                    throw AxeneError(status: 0, message: "Axene: non-HTTP response")
+                    throw TaifaMailError(status: 0, message: "TaifaMail: non-HTTP response")
                 }
                 if isRetryable(http.statusCode), attempt < maxRetries {
                     try await sleep(backoff(http, attempt: attempt))
@@ -175,7 +175,7 @@ final class Transport {
                     throw mapError(status: http.statusCode, data: data)
                 }
                 return data
-            } catch let error as AxeneError {
+            } catch let error as TaifaMailError {
                 throw error // a real API error: do not retry
             } catch {
                 lastError = error // transport error: retry if attempts remain
@@ -185,7 +185,7 @@ final class Transport {
                 }
             }
         }
-        throw AxeneError(status: 0, message: "Axene request failed: \(String(describing: lastError))")
+        throw TaifaMailError(status: 0, message: "TaifaMail request failed: \(String(describing: lastError))")
     }
 
     // MARK: Multipart upload
@@ -197,15 +197,15 @@ final class Transport {
         var request = URLRequest(url: url, timeoutInterval: timeout)
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        request.setValue("axene-mailer-swift", forHTTPHeaderField: "User-Agent")
+        request.setValue("taifa-mail-swift", forHTTPHeaderField: "User-Agent")
 
-        let boundary = "axene-\(UUID().uuidString)"
+        let boundary = "taifamail-\(UUID().uuidString)"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.httpBody = multipartBody(boundary: boundary, field: "file", filename: filename, data: file)
 
         let (data, response) = try await session.data(for: request)
         guard let http = response as? HTTPURLResponse else {
-            throw AxeneError(status: 0, message: "Axene: non-HTTP response")
+            throw TaifaMailError(status: 0, message: "TaifaMail: non-HTTP response")
         }
         if !(200...299).contains(http.statusCode) {
             throw mapError(status: http.statusCode, data: data)
@@ -213,7 +213,7 @@ final class Transport {
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
-            throw AxeneError(status: 0, message: "Axene: failed to decode response: \(error)")
+            throw TaifaMailError(status: 0, message: "TaifaMail: failed to decode response: \(error)")
         }
     }
 
@@ -232,7 +232,7 @@ final class Transport {
 
     private func buildURL(_ path: String, query: [String: String?]) throws -> URL {
         guard var components = URLComponents(string: baseURL + path) else {
-            throw AxeneError(status: 0, message: "Axene: invalid URL for path \(path)")
+            throw TaifaMailError(status: 0, message: "TaifaMail: invalid URL for path \(path)")
         }
         let items = query.compactMap { key, value -> URLQueryItem? in
             guard let value else { return nil }
@@ -242,7 +242,7 @@ final class Transport {
             components.queryItems = (components.queryItems ?? []) + items
         }
         guard let url = components.url else {
-            throw AxeneError(status: 0, message: "Axene: failed to build URL for path \(path)")
+            throw TaifaMailError(status: 0, message: "TaifaMail: failed to build URL for path \(path)")
         }
         return url
     }
@@ -264,23 +264,23 @@ final class Transport {
         try await Task.sleep(nanoseconds: UInt64(max(0, seconds) * 1_000_000_000))
     }
 
-    /// Map the API's `{ detail: { code, message } }` (or string) into ``AxeneError``.
-    private func mapError(status: Int, data: Data) -> AxeneError {
-        let fallback = "Axene request failed (\(status))"
+    /// Map the API's `{ detail: { code, message } }` (or string) into ``TaifaMailError``.
+    private func mapError(status: Int, data: Data) -> TaifaMailError {
+        let fallback = "TaifaMail request failed (\(status))"
         guard !data.isEmpty,
               let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
-            return AxeneError(status: status, message: fallback)
+            return TaifaMailError(status: status, message: fallback)
         }
         let detail = root["detail"]
         if let obj = detail as? [String: Any] {
             let message = obj["message"] as? String ?? fallback
             let code = obj["code"] as? String
-            return AxeneError(status: status, message: message, code: code)
+            return TaifaMailError(status: status, message: message, code: code)
         }
         if let text = detail as? String {
-            return AxeneError(status: status, message: text)
+            return TaifaMailError(status: status, message: text)
         }
-        return AxeneError(status: status, message: fallback)
+        return TaifaMailError(status: status, message: fallback)
     }
 }
 

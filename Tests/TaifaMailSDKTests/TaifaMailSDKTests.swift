@@ -1,11 +1,11 @@
 import XCTest
-@testable import AxeneMailer
+@testable import TaifaMailSDK
 
-final class AxeneMailerTests: XCTestCase {
-    private func makeClient(maxRetries: Int = 3) -> AxeneClient {
-        AxeneClient(
+final class TaifaMailSDKTests: XCTestCase {
+    private func makeClient(maxRetries: Int = 3) -> TaifaMailClient {
+        TaifaMailClient(
             apiKey: "axm_k_test",
-            baseURL: "https://mail.axene.io",
+            baseURL: "https://govconnect.ke",
             maxRetries: maxRetries,
             session: MockURLProtocol.makeSession()
         )
@@ -29,7 +29,7 @@ final class AxeneMailerTests: XCTestCase {
         _ = try await makeClient().emails.list()
         let req = try XCTUnwrap(MockURLProtocol.capturedRequests().first)
         XCTAssertEqual(req.headers["Authorization"], "Bearer axm_k_test")
-        XCTAssertTrue(req.url.absoluteString.hasPrefix("https://mail.axene.io/v1/emails/"))
+        XCTAssertTrue(req.url.absoluteString.hasPrefix("https://govconnect.ke/v1/emails/"))
     }
 
     // MARK: from_ mapping
@@ -176,8 +176,8 @@ final class AxeneMailerTests: XCTestCase {
         MockURLProtocol.enqueue(StubResponse(status: 422, json: #"{"detail":{"code":"unverified_sender","message":"Sender not verified"}}"#))
         do {
             _ = try await makeClient(maxRetries: 1).emails.send(.init(from: "a@x.com", to: ["b@y.com"], subject: "s"))
-            XCTFail("expected AxeneError")
-        } catch let error as AxeneError {
+            XCTFail("expected TaifaMailError")
+        } catch let error as TaifaMailError {
             XCTAssertEqual(error.status, 422)
             XCTAssertEqual(error.code, "unverified_sender")
             XCTAssertEqual(error.message, "Sender not verified")

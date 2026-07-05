@@ -1,6 +1,6 @@
 import Foundation
 
-/// The `templates` resource. Accessed as `axene.templates`. Starter plan and up.
+/// The `templates` resource. Accessed as `taifamail.templates`. Starter plan and up.
 public final class Templates {
     private let http: Transport
     init(_ http: Transport) { self.http = http }

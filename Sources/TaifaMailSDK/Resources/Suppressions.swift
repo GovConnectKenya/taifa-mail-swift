@@ -1,6 +1,6 @@
 import Foundation
 
-/// The `suppressions` resource. Accessed as `axene.suppressions`.
+/// The `suppressions` resource. Accessed as `taifamail.suppressions`.
 public final class Suppressions {
     private let http: Transport
     init(_ http: Transport) { self.http = http }

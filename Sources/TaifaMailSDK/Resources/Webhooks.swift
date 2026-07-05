@@ -1,6 +1,6 @@
 import Foundation
 
-/// The `webhooks` resource. Accessed as `axene.webhooks`.
+/// The `webhooks` resource. Accessed as `taifamail.webhooks`.
 public final class Webhooks {
     private let http: Transport
     init(_ http: Transport) { self.http = http }

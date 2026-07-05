@@ -81,7 +81,7 @@ public struct SendEmailParams {
     }
 }
 
-/// The `emails` resource. Accessed as `axene.emails`.
+/// The `emails` resource. Accessed as `taifamail.emails`.
 public final class Emails {
     private let http: Transport
     init(_ http: Transport) { self.http = http }

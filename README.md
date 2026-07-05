@@ -13,11 +13,11 @@ Add the package to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/taifamail/taifa-mail-sdks", from: "0.1.0")
+    .package(url: "https://github.com/GovConnectKenya/taifa-mail-swift", from: "0.1.0")
 ],
 targets: [
     .target(name: "YourApp", dependencies: [
-        .product(name: "TaifaMailSDK", package: "taifa-mail-sdks")
+        .product(name: "TaifaMailSDK", package: "taifa-mail-swift")
     ])
 ]
 ```

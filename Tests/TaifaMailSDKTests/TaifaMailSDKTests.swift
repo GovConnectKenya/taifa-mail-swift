@@ -4,7 +4,7 @@ import XCTest
 final class TaifaMailSDKTests: XCTestCase {
     private func makeClient(maxRetries: Int = 3) -> TaifaMailClient {
         TaifaMailClient(
-            apiKey: "axm_k_test",
+            apiKey: "tfm_k_test",
             baseURL: "https://govconnect.ke",
             maxRetries: maxRetries,
             session: MockURLProtocol.makeSession()
@@ -28,7 +28,7 @@ final class TaifaMailSDKTests: XCTestCase {
         MockURLProtocol.enqueue(StubResponse(json: "[]"))
         _ = try await makeClient().emails.list()
         let req = try XCTUnwrap(MockURLProtocol.capturedRequests().first)
-        XCTAssertEqual(req.headers["Authorization"], "Bearer axm_k_test")
+        XCTAssertEqual(req.headers["Authorization"], "Bearer tfm_k_test")
         XCTAssertTrue(req.url.absoluteString.hasPrefix("https://govconnect.ke/v1/emails/"))
     }
 

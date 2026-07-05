@@ -42,7 +42,7 @@ struct DynamicKey: CodingKey {
 
 /// Configuration for ``Transport``.
 public struct TaifaMailOptions {
-    /// API key from your Taifa Mail dashboard (starts with `axm_k_`).
+    /// API key from your Taifa Mail dashboard (starts with `tfm_k_`).
     public let apiKey: String
     /// Override the API base URL. Defaults to `https://govconnect.ke`.
     public let baseURL: String

@@ -30,7 +30,7 @@ In Xcode: File, Add Package Dependencies, paste the repository URL, and add the
 ```swift
 import TaifaMailSDK
 
-let taifamail = TaifaMailClient(apiKey: "axm_k_...")
+let taifamail = TaifaMailClient(apiKey: "tfm_k_...")
 
 // Send an email. A bare string is sugar for an Address.
 let result = try await taifamail.emails.send(.init(
@@ -48,7 +48,7 @@ The client is safe to construct once and reuse.
 
 ```swift
 let taifamail = TaifaMailClient(
-    apiKey: "axm_k_...",
+    apiKey: "tfm_k_...",
     baseURL: "https://govconnect.ke", // override for staging
     maxRetries: 3,                    // total attempts on 429 / 5xx
     timeout: 30                       // per-request seconds

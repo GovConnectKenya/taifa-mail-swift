@@ -7,7 +7,7 @@ import Foundation
 /// and ``webhooks``.
 ///
 /// ```swift
-/// let taifamail = TaifaMailClient(apiKey: "axm_k_...")
+/// let taifamail = TaifaMailClient(apiKey: "tfm_k_...")
 /// let result = try await taifamail.emails.send(
 ///     .init(from: "hello@yourdomain.com",
 ///           to: ["customer@example.com"],
